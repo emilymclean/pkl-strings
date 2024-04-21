@@ -26,7 +26,7 @@ local function mapStrings(
 
 local function mapLanguageStrings(
     strings: List<StringLanguagePair>
-): Mapping<String, StringUnit | SubstitutionStringUnit | Variations> = new Mapping {
+): Mapping<String, StringLocalization> = new Mapping {
     for (s in strings) {
         [s.code] = if (s.string is string.SingleResourceString)
             mapSingleString(s.string)
@@ -35,12 +35,19 @@ local function mapLanguageStrings(
     }
 }
 
-local function mapSingleString(s: string.SingleResourceString): StringUnit = new StringUnit {
-    value = s.value
+local function mapSingleString(s: string.SingleResourceString): StringLocalization = new StringLocalization {
+    stringUnit = new StringUnit {
+        value = s.value
+    }
 }
 
-local function mapPluralString(s: string.QuantityResourceString): SubstitutionStringUnit = new SubstitutionStringUnit {
-    value = if (s.first().contains("%1$d")) s.first().replaceAll("%1$d", "%#@arg1@") else s.first().replaceFirst("%d", "%#@arg1@")
+local function mapPluralString(s: string.QuantityResourceString): StringLocalization = new StringLocalization {
+    stringUnit = new StringUnit {
+        value = if (s.first().contains("%1$d")) 
+            s.first().replaceAll("%1$d", "%#@arg1@") 
+        else 
+            s.first().replaceFirst("%d", "%#@arg1@")
+    }
     substitutions = new Mapping {
         ["arg1"] = new Substitution {
             argNum = 1
@@ -48,8 +55,10 @@ local function mapPluralString(s: string.QuantityResourceString): SubstitutionSt
             variations = new Variations {
                 plural = new Mapping {
                     for (option in s.options) {
-                        [option.quantity] = new StringUnit {
-                            value = option.value
+                        [option.quantity] = new StringLocalization {
+                            stringUnit = new StringUnit {
+                                value = option.value
+                            }
                         }
                     }
                 }
@@ -73,6 +82,7 @@ local function getKeys(
     sourceLanguage: String
 ): List<String> = languages.filter((l) -> l.code == sourceLanguage).flatMap((l) -> l.strings.map((s) -> s.name))
 
+
 class Localizable {
     sourceLanguage: String = "en"
     strings: Mapping<String, LocalizableString>
@@ -81,16 +91,18 @@ class Localizable {
 
 class LocalizableString {
     extractionState: String = "manual"
-    localizations: Mapping<String, StringUnit | SubstitutionStringUnit | Variations>
+    localizations: Mapping<String, StringLocalization>
 }
 
-open class StringUnit {
+class StringLocalization {
+    stringUnit: StringUnit?
+    substitutions: Mapping<String, Substitution>?
+    variations: Variations?
+}
+
+class StringUnit {
     state: String = "translated"
     value: String
-}
-
-class SubstitutionStringUnit extends StringUnit {
-    substitutions: Mapping<String, Substitution>
 }
 
 class Substitution {
@@ -100,7 +112,7 @@ class Substitution {
 }
 
 class Variations {
-    plural: Mapping<string.Quantity, StringUnit>
+    plural: Mapping<string.Quantity, StringLocalization>
 }
 
 local class StringLanguagePair {
