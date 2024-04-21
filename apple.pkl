@@ -1,60 +1,62 @@
 import "string.pkl"
 
-function render(localizable: string.Localizable): Mapping<String, FileOutput> = new Mapping {
-    ["apple/Localizable.xcstrings"] = new FileOutput {
-        renderer = new JsonRenderer {}
-        value = new Localizable {
-            sourceLanguage = localizable.sourceLanguage
-            strings = mapStrings(
-                getKeys(localizable.languages, localizable.sourceLanguage),
-                localizable.languages
-            )
+class AppleStringRenderer extends string.StringRenderer {
+    function render(localizable: string.Localizable): Mapping<String, FileOutput> = new Mapping {
+        ["apple/Localizable.xcstrings"] = new FileOutput {
+            renderer = new JsonRenderer {}
+            value = new Localizable {
+                sourceLanguage = localizable.sourceLanguage
+                strings = mapStrings(
+                    getKeys(localizable.languages, localizable.sourceLanguage),
+                    localizable.languages
+                )
+            }
         }
     }
-}
 
-local function mapStrings(
-    keys: List<String>, 
-    languages: List<string.Language>
-): Mapping<String, LocalizableString> = new Mapping {
-    for (key in keys) {
-        [key] = new LocalizableString {
-            localizations = mapLanguageStrings(getStringInLanguages(key, languages))
+    local function mapStrings(
+        keys: List<String>, 
+        languages: List<string.Language>
+    ): Mapping<String, LocalizableString> = new Mapping {
+        for (key in keys) {
+            [key] = new LocalizableString {
+                localizations = mapLanguageStrings(getStringInLanguages(key, languages))
+            }
         }
     }
-}
 
-local function mapLanguageStrings(
-    strings: List<StringLanguagePair>
-): Mapping<String, StringLocalization> = new Mapping {
-    for (s in strings) {
-        [s.code] = if (s.string is string.SingleResourceString)
-            mapSingleString(s.string)
-        else
-            mapPluralString(s.string)
+    local function mapLanguageStrings(
+        strings: List<StringLanguagePair>
+    ): Mapping<String, StringLocalization> = new Mapping {
+        for (s in strings) {
+            [s.code] = if (s.string is string.SingleResourceString)
+                mapSingleString(s.string)
+            else
+                mapPluralString(s.string)
+        }
     }
-}
 
-local function mapSingleString(s: string.SingleResourceString): StringLocalization = new StringLocalization {
-    stringUnit = new StringUnit {
-        value = s.value
+    local function mapSingleString(s: string.SingleResourceString): StringLocalization = new StringLocalization {
+        stringUnit = new StringUnit {
+            value = s.value
+        }
     }
-}
 
-local function mapPluralString(s: string.QuantityResourceString): StringLocalization = new StringLocalization {
-    stringUnit = new StringUnit {
-        value = replaceFirstDigit(s.first())
-    }
-    substitutions = new Mapping {
-        ["arg1"] = new Substitution {
-            argNum = 1
-            formatSpecifier = "d"
-            variations = new Variations {
-                plural = new Mapping {
-                    for (option in s.options) {
-                        [option.quantity] = new StringLocalization {
-                            stringUnit = new StringUnit {
-                                value = replaceFirstDigit(option.value)
+    local function mapPluralString(s: string.QuantityResourceString): StringLocalization = new StringLocalization {
+        stringUnit = new StringUnit {
+            value = replaceFirstDigit(s.first())
+        }
+        substitutions = new Mapping {
+            ["arg1"] = new Substitution {
+                argNum = 1
+                formatSpecifier = "d"
+                variations = new Variations {
+                    plural = new Mapping {
+                        for (option in s.options) {
+                            [option.quantity] = new StringLocalization {
+                                stringUnit = new StringUnit {
+                                    value = replaceFirstDigit(option.value)
+                                }
                             }
                         }
                     }
@@ -62,27 +64,27 @@ local function mapPluralString(s: string.QuantityResourceString): StringLocaliza
             }
         }
     }
+
+    local function getStringInLanguages(
+        key: String,
+        languages: List<string.Language>
+    ): List<StringLanguagePair> = languages.flatMap(
+        (l) -> l.strings.filter((s) -> s.name == key).map((s) -> new StringLanguagePair {
+            string = s
+            code = l.code ?? defaultLanguage
+        })
+    )
+
+    local function getKeys(
+        languages: List<string.Language>,
+        sourceLanguage: String
+    ): List<String> = languages.filter((l) -> l.code == sourceLanguage).flatMap((l) -> l.strings.map((s) -> s.name))
+
+    local function replaceFirstDigit(value: String): String = if (value.contains("%1$d")) 
+        value.replaceAll("%1$d", "%#@arg1@") 
+    else 
+        value.replaceFirst("%d", "%#@arg1@")
 }
-
-local function getStringInLanguages(
-    key: String,
-    languages: List<string.Language>
-): List<StringLanguagePair> = languages.flatMap(
-    (l) -> l.strings.filter((s) -> s.name == key).map((s) -> new StringLanguagePair {
-        string = s
-        code = l.code ?? defaultLanguage
-    })
-)
-
-local function getKeys(
-    languages: List<string.Language>,
-    sourceLanguage: String
-): List<String> = languages.filter((l) -> l.code == sourceLanguage).flatMap((l) -> l.strings.map((s) -> s.name))
-
-local function replaceFirstDigit(value: String): String = if (value.contains("%1$d")) 
-    value.replaceAll("%1$d", "%#@arg1@") 
-else 
-    value.replaceFirst("%d", "%#@arg1@")
 
 class Localizable {
     sourceLanguage: String = "en"
@@ -92,6 +94,7 @@ class Localizable {
 
 class LocalizableString {
     extractionState: String = "manual"
+    comment: String?
     localizations: Mapping<String, StringLocalization>
 }
 

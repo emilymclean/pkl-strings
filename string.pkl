@@ -1,5 +1,11 @@
 typealias Quantity = "zero" | "one" | "two" | "few" | "many" | "other"
 
+abstract class StringRenderer {
+
+    abstract function render(localizable: Localizable): Mapping<String, FileOutput>
+
+}
+
 class Localizable {
     sourceLanguage: String = "en"
     languages: List<Language>

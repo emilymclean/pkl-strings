@@ -1,58 +1,60 @@
 import "pkl:xml" as xml
 import "string.pkl"
 
-function render(localizable: string.Localizable): Mapping<String, FileOutput> = new Mapping {
-    for(language in localizable.languages) {
-        [
-            if (language.code == localizable.sourceLanguage) 
-                "android/values/strings.xml" 
-            else 
-                "android/values-\(language.code)/strings.xml"
-        ] = new FileOutput {
-            renderer = new xml.Renderer {}
-            value = mapResources(language.strings)
+class AndroidStringRenderer extends string.StringRenderer {
+    function render(localizable: string.Localizable): Mapping<String, FileOutput> = new Mapping {
+        for(language in localizable.languages) {
+            [
+                if (language.code == localizable.sourceLanguage) 
+                    "android/values/strings.xml" 
+                else 
+                    "android/values-\(language.code)/strings.xml"
+            ] = new FileOutput {
+                renderer = new xml.Renderer {}
+                value = mapResources(language.strings)
+            }
         }
     }
-}
 
-local function mapResources(resources: List<string.ResourceString>) = (xml.Element("resources")) {
-    for (r in resources) {
-        if (r is string.SingleResourceString)
-            mapSingleResourceString(r)
-        else if(r is string.QuantityResourceString)
-            mapQuantityResourceString(r)
-        else
-            throw("Unknown element")
+    local function mapResources(resources: List<string.ResourceString>) = (xml.Element("resources")) {
+        for (r in resources) {
+            if (r is string.SingleResourceString)
+                mapSingleResourceString(r)
+            else if(r is string.QuantityResourceString)
+                mapQuantityResourceString(r)
+            else
+                throw("Unknown element")
+        }
     }
-}
 
-local function mapSingleResourceString(
-    s: string.SingleResourceString
-): Dynamic = (xml.Element("string")) {
-    attributes {
-        ["name"] = s.name
+    local function mapSingleResourceString(
+        s: string.SingleResourceString
+    ): Dynamic = (xml.Element("string")) {
+        attributes {
+            ["name"] = s.name
+        }
+        s.value
     }
-    s.value
-}
 
-local function mapQuantityResourceString(
-    s: string.QuantityResourceString
-): Dynamic = (xml.Element("plurals")) {
-    attributes {
-        ["name"] = s.name
+    local function mapQuantityResourceString(
+        s: string.QuantityResourceString
+    ): Dynamic = (xml.Element("plurals")) {
+        attributes {
+            ["name"] = s.name
+        }
+        for (q in s.options) {
+            mapQuantityOption(q)
+        }
     }
-    for (q in s.options) {
-        mapQuantityOption(q)
-    }
-}
 
-local function mapQuantityOption(
-    q: string.QuantityOption
-): Dynamic = (xml.Element("item")) {
-    attributes {
-        ["quantity"] = q.quantity
+    local function mapQuantityOption(
+        q: string.QuantityOption
+    ): Dynamic = (xml.Element("item")) {
+        attributes {
+            ["quantity"] = q.quantity
+        }
+        q.value
     }
-    q.value
 }
 
 

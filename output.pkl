@@ -4,12 +4,15 @@ import "apple.pkl"
 import "string.pkl"
 
 localizable: string.Localizable
+renderers: List<string.StringRenderer> = List(
+    new android.AndroidStringRenderer {},
+    new apple.AppleStringRenderer {}
+)
 
-hidden androidOutput = android.render(localizable)
-hidden appleOutput = apple.render(localizable)
 hidden output {
     files {
-        ...androidOutput
-        ...appleOutput
+        for (renderer in renderers) {
+            ...renderer.render(localizable)
+        }
     }
 }
