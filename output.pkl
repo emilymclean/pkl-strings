@@ -9,17 +9,7 @@ hidden androidOutput = android.render(localizable)
 hidden appleOutput = apple.render(localizable)
 hidden output {
     files {
-        for (k,v in androidOutput) {
-            [k] {
-                renderer = v.renderer
-                value = v.value
-            }
-        }
-        for (k,v in appleOutput) {
-            [k] {
-                renderer = v.renderer
-                value = v.value
-            }
-        }
+        ...androidOutput
+        ...appleOutput
     }
 }

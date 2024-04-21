@@ -1,14 +1,14 @@
 import "pkl:xml" as xml
 import "string.pkl"
 
-function render(localizable: string.Localizable): Mapping<String, Any> = new Mapping {
+function render(localizable: string.Localizable): Mapping<String, FileOutput> = new Mapping {
     for(language in localizable.languages) {
         [
             if (language.code == localizable.sourceLanguage) 
                 "android/values/strings.xml" 
             else 
                 "android/values-\(language.code)/strings.xml"
-        ] {
+        ] = new FileOutput {
             renderer = new xml.Renderer {}
             value = mapResources(language.strings)
         }

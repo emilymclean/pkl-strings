@@ -1,7 +1,7 @@
 import "string.pkl"
 
-function render(localizable: string.Localizable): Mapping<String, Any> = new Mapping {
-    ["apple/Localizable.xcstrings"] {
+function render(localizable: string.Localizable): Mapping<String, FileOutput> = new Mapping {
+    ["apple/Localizable.xcstrings"] = new FileOutput {
         renderer = new JsonRenderer {}
         value = new Localizable {
             sourceLanguage = localizable.sourceLanguage
@@ -43,10 +43,7 @@ local function mapSingleString(s: string.SingleResourceString): StringLocalizati
 
 local function mapPluralString(s: string.QuantityResourceString): StringLocalization = new StringLocalization {
     stringUnit = new StringUnit {
-        value = if (s.first().contains("%1$d")) 
-            s.first().replaceAll("%1$d", "%#@arg1@") 
-        else 
-            s.first().replaceFirst("%d", "%#@arg1@")
+        value = replaceFirstDigit(s.first())
     }
     substitutions = new Mapping {
         ["arg1"] = new Substitution {
@@ -57,7 +54,7 @@ local function mapPluralString(s: string.QuantityResourceString): StringLocaliza
                     for (option in s.options) {
                         [option.quantity] = new StringLocalization {
                             stringUnit = new StringUnit {
-                                value = option.value
+                                value = replaceFirstDigit(option.value)
                             }
                         }
                     }
@@ -82,6 +79,10 @@ local function getKeys(
     sourceLanguage: String
 ): List<String> = languages.filter((l) -> l.code == sourceLanguage).flatMap((l) -> l.strings.map((s) -> s.name))
 
+local function replaceFirstDigit(value: String): String = if (value.contains("%1$d")) 
+    value.replaceAll("%1$d", "%#@arg1@") 
+else 
+    value.replaceFirst("%d", "%#@arg1@")
 
 class Localizable {
     sourceLanguage: String = "en"
