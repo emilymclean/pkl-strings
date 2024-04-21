@@ -1,6 +1,8 @@
 import "string.pkl"
 
 class AppleStringRenderer extends string.StringRenderer {
+    platformName: String = "apple"
+
     function render(localizable: string.Localizable): Mapping<String, FileOutput> = new Mapping {
         ["apple/Localizable.xcstrings"] = new FileOutput {
             renderer = new JsonRenderer {}
@@ -38,11 +40,11 @@ class AppleStringRenderer extends string.StringRenderer {
 
     local function mapSingleString(s: string.SingleResourceString): StringLocalization = new StringLocalization {
         stringUnit = new StringUnit {
-            value = s.value
+            value = s.get(platformName)
         }
     }
 
-    local function mapPluralString(s: string.QuantityResourceString): StringLocalization = _mapPluralString(s, replaceFirstDigit(s.first()))
+    local function mapPluralString(s: string.QuantityResourceString): StringLocalization = _mapPluralString(s, replaceFirstDigit(s.first(platformName)))
 
     local function _mapPluralString(s: string.QuantityResourceString, f: FirstDigitInformation): StringLocalization = new StringLocalization {
         stringUnit = new StringUnit {
@@ -57,7 +59,7 @@ class AppleStringRenderer extends string.StringRenderer {
                         for (option in s.options) {
                             [option.quantity] = new StringLocalization {
                                 stringUnit = new StringUnit {
-                                    value = replaceFirstDigit(option.value).transformed
+                                    value = replaceFirstDigit(option.get(platformName)).transformed
                                 }
                             }
                         }

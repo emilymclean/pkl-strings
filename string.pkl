@@ -2,6 +2,8 @@ typealias Quantity = "zero" | "one" | "two" | "few" | "many" | "other"
 
 abstract class StringRenderer {
 
+    platformName: String
+
     abstract function render(localizable: Localizable): Mapping<String, FileOutput>
 
 }
@@ -22,15 +24,21 @@ abstract class ResourceString {
 
 class SingleResourceString extends ResourceString {
     value: String
+    platformValue: Mapping<String, String>?
+
+    function get(platformName: String): String = platformValue?.getOrNull(platformName) ?? value
 }
 
 class QuantityResourceString extends ResourceString {
-    options: List<QuantityOption>
+    options: List<QuantityOption>(length > 0)
 
-    function first(): String = options[0].value
+    function first(platformName: String): String = options[0].get(platformName)
 }
 
 class QuantityOption {
     quantity: Quantity
     value: String
+    platformValue: Mapping<String, String>?
+
+    function get(platformName: String): String = platformValue?.getOrNull(platformName) ?? value
 }

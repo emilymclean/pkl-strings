@@ -2,6 +2,8 @@ import "pkl:xml" as xml
 import "string.pkl"
 
 class AndroidStringRenderer extends string.StringRenderer {
+    platformName: String = "android"
+
     function render(localizable: string.Localizable): Mapping<String, FileOutput> = new Mapping {
         for(language in localizable.languages) {
             [
@@ -33,7 +35,7 @@ class AndroidStringRenderer extends string.StringRenderer {
         attributes {
             ["name"] = s.name
         }
-        s.value
+        s.get(platformName)
     }
 
     local function mapQuantityResourceString(
@@ -53,7 +55,7 @@ class AndroidStringRenderer extends string.StringRenderer {
         attributes {
             ["quantity"] = q.quantity
         }
-        q.value
+        q.get(platformName)
     }
 }
 
