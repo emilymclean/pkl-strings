@@ -1,0 +1,21 @@
+
+hidden resources: List<ResourceString>
+
+typealias Quanitity = "zero" | "one" | "two" | "few" | "many" | "other"
+
+abstract class ResourceString {
+    name: String
+}
+
+class SingleResourceString extends ResourceString {
+    value: String
+}
+
+class QuantityResourceString extends ResourceString {
+    options: List<QuantityOption>
+}
+
+class QuantityOption {
+    quantity: Quanitity
+    value: String
+}

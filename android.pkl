@@ -1,0 +1,44 @@
+import "pkl:xml" as xml
+import "string.pkl"
+
+function mapResources(resources: List<string.ResourceString>) = (xml.Element("resources")) {
+    for (r in resources) {
+        if (r is string.SingleResourceString)
+            mapSingleResourceString(r)
+        else if(r is string.QuantityResourceString)
+            mapQuantityResourceString(r)
+        else
+            throw("Unknown element")
+    }
+}
+
+function mapSingleResourceString(
+    s: string.SingleResourceString
+): Dynamic = (xml.Element("string")) {
+    attributes {
+        ["name"] = s.name
+    }
+    s.value
+}
+
+function mapQuantityResourceString(
+    s: string.QuantityResourceString
+): Dynamic = (xml.Element("plurals")) {
+    attributes {
+        ["name"] = s.name
+    }
+    for (q in s.options) {
+        mapQuantityOption(q)
+    }
+}
+
+function mapQuantityOption(
+    q: string.QuantityOption
+): Dynamic = (xml.Element("item")) {
+    attributes {
+        ["quantity"] = q.quantity
+    }
+    q.value
+}
+
+

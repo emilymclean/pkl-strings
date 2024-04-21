@@ -1,0 +1,32 @@
+import "pkl:xml" as xml
+import "android.pkl"
+import "string.pkl"
+
+resources = List(
+    new string.SingleResourceString {
+        name = "Test"
+        value = "TestValue"
+    },
+    new string.QuantityResourceString {
+        name = "Quantity"
+        options = List(
+            new string.QuantityOption {
+                quantity = "one"
+                value = "Thing"
+            },
+            new string.QuantityOption {
+                quantity = "other"
+                value = "Things"
+            }
+        )
+    }
+)
+
+hidden output {
+    files {
+        ["strings.xml"] {
+            renderer = new xml.Renderer {}
+            value = android.mapResources(resources)
+        }
+    }
+}
