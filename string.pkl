@@ -11,7 +11,7 @@ class Language {
 }
 
 abstract class ResourceString {
-    name: String(matches(Regex("^[a-z\\d_]+$")))
+    name: String(matches(Regex("^[a-z_][a-z\\d_]*$")))
 }
 
 class SingleResourceString extends ResourceString {
