@@ -35,6 +35,19 @@ localizable = new string.Localizable {
                             value = "%1$d Things"
                         }
                     )
+                },
+                new string.QuantityResourceString {
+                    name = "quantity3"
+                    options = List(
+                        new string.QuantityOption {
+                            quantity = "one"
+                            value = "%1$s %2$u Thing"
+                        },
+                        new string.QuantityOption {
+                            quantity = "other"
+                            value = "%1$s %2$u Things"
+                        }
+                    )
                 }
             )
         },

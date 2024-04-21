@@ -42,20 +42,22 @@ class AppleStringRenderer extends string.StringRenderer {
         }
     }
 
-    local function mapPluralString(s: string.QuantityResourceString): StringLocalization = new StringLocalization {
+    local function mapPluralString(s: string.QuantityResourceString): StringLocalization = _mapPluralString(s, replaceFirstDigit(s.first()))
+
+    local function _mapPluralString(s: string.QuantityResourceString, f: FirstDigitInformation): StringLocalization = new StringLocalization {
         stringUnit = new StringUnit {
-            value = replaceFirstDigit(s.first())
+            value = f.transformed
         }
         substitutions = new Mapping {
             ["arg1"] = new Substitution {
-                argNum = 1
-                formatSpecifier = "d"
+                argNum = f.position
+                formatSpecifier = f.formatChar
                 variations = new Variations {
                     plural = new Mapping {
                         for (option in s.options) {
                             [option.quantity] = new StringLocalization {
                                 stringUnit = new StringUnit {
-                                    value = replaceFirstDigit(option.value)
+                                    value = replaceFirstDigit(option.value).transformed
                                 }
                             }
                         }
@@ -80,10 +82,24 @@ class AppleStringRenderer extends string.StringRenderer {
         sourceLanguage: String
     ): List<String> = languages.filter((l) -> l.code == sourceLanguage).flatMap((l) -> l.strings.map((s) -> s.name))
 
-    local function replaceFirstDigit(value: String): String = if (value.contains("%1$d")) 
-        value.replaceAll("%1$d", "%#@arg1@") 
+    local function replaceFirstDigit(value: String): FirstDigitInformation = _replaceFirstDigit(
+        value, 
+        Regex("%(\\d)\\$([dDuUxXfeEgGcC])").findMatchesIn(value).firstOrNull,
+        Regex("%([dDuUxXfeEgGcC])").findMatchesIn(value).firstOrNull
+    )
+
+    local function _replaceFirstDigit(value: String, specifiedMatch: RegexMatch?, positionalMatch: RegexMatch?): FirstDigitInformation = if (specifiedMatch != null)
+        new FirstDigitInformation {
+            transformed = value.replaceAll("%\(specifiedMatch.groups[1].value)$\(specifiedMatch.groups[2].value)", "%#@arg1@")
+            formatChar = specifiedMatch.groups[2].value
+            position = specifiedMatch.groups[1].value.toInt()
+        } 
     else 
-        value.replaceFirst("%d", "%#@arg1@")
+        new FirstDigitInformation {
+            transformed = value.replaceFirst("%[dDuUxXfeEgGcC]", "%#@arg1@")
+            formatChar = positionalMatch?.groups[0]?.value ?? throw("Plural strings must haveat least one digit parameter")
+        } 
+        
 }
 
 class Localizable {
@@ -122,4 +138,10 @@ class Variations {
 local class StringLanguagePair {
     string: string.ResourceString
     code: String
+}
+
+local class FirstDigitInformation {
+    position: Int = 1
+    formatChar: String
+    transformed: String
 }
