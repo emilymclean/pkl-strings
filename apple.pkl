@@ -1,0 +1,94 @@
+import "string.pkl"
+
+function render(localizable: string.Localizable): Mapping<String, Any> = new Mapping {
+    ["Localizable.xcstrings"] {
+        renderer = new JsonRenderer {}
+        value = new Localizable {
+            sourceLanguage = localizable.sourceLanguage
+            strings = mapStrings(
+                getKeys(localizable.languages, localizable.sourceLanguage),
+                localizable.languages
+            )
+        }
+    }
+}
+
+local function mapStrings(
+    keys: List<String>, 
+    languages: List<string.Language>
+): Mapping<String, LocalizableString> = new Mapping {
+    for (key in keys) {
+        [key] = new LocalizableString {
+            localizations = mapLanguageStrings(getStringInLanguages(key, languages))
+        }
+    }
+}
+
+local function mapLanguageStrings(
+    strings: List<StringLanguagePair>
+): Mapping<String, StringUnit | SubstitutionStringUnit | Variations> = new Mapping {
+    for (s in strings) {
+        [s.code] = if (s.string is string.SingleResourceString)
+            mapSingleString(s.string)
+        else
+            mapPluralString(s.string)
+    }
+}
+
+local function mapSingleString(s: string.SingleResourceString): StringUnit = new StringUnit {
+    value = s.value
+}
+
+local function mapPluralString(s: string.QuantityResourceString): StringUnit | SubstitutionStringUnit | Variations = new StringUnit {
+    value = "Unimplemented"
+}
+
+local function getStringInLanguages(
+    key: String,
+    languages: List<string.Language>
+): List<StringLanguagePair> = languages.flatMap(
+    (l) -> l.strings.filter((s) -> s.name == key).map((s) -> new StringLanguagePair {
+        string = s
+        code = l.code ?? defaultLanguage
+    })
+)
+
+local function getKeys(
+    languages: List<string.Language>,
+    sourceLanguage: String
+): List<String> = languages.filter((l) -> l.code == sourceLanguage).flatMap((l) -> l.strings.map((s) -> s.name))
+
+class Localizable {
+    sourceLanguage: String = "en"
+    strings: Mapping<String, LocalizableString>
+    version: String = "1.0"
+}
+
+class LocalizableString {
+    extractionState: String = "manual"
+    localizations: Mapping<String, StringUnit | SubstitutionStringUnit | Variations>
+}
+
+open class StringUnit {
+    state: String = "translated"
+    value: String
+}
+
+class SubstitutionStringUnit extends StringUnit {
+    substitutions: Mapping<String, Substitution>
+}
+
+class Substitution {
+    argNum: Int
+    formatSpecifier: String
+    variations: Variations
+}
+
+class Variations {
+    plural: Mapping<string.Quantity, StringUnit>
+}
+
+local class StringLanguagePair {
+    string: string.ResourceString
+    code: String
+}

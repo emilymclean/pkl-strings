@@ -1,16 +1,16 @@
 import "pkl:xml" as xml
 import "string.pkl"
 
-function render(languages: List<string.Language>): Mapping<String, Any> = new Mapping {
-    for(language in languages) {
-        [if (language.code == null) "values/strings.xml" else "values-\(language.code)/strings.xml"] {
+function render(localizable: string.Localizable): Mapping<String, Any> = new Mapping {
+    for(language in localizable.languages) {
+        [if (language.code == localizable.sourceLanguage) "values/strings.xml" else "values-\(language.code)/strings.xml"] {
             renderer = new xml.Renderer {}
             value = mapResources(language.strings)
         }
     }
 }
 
-function mapResources(resources: List<string.ResourceString>) = (xml.Element("resources")) {
+local function mapResources(resources: List<string.ResourceString>) = (xml.Element("resources")) {
     for (r in resources) {
         if (r is string.SingleResourceString)
             mapSingleResourceString(r)
@@ -21,7 +21,7 @@ function mapResources(resources: List<string.ResourceString>) = (xml.Element("re
     }
 }
 
-function mapSingleResourceString(
+local function mapSingleResourceString(
     s: string.SingleResourceString
 ): Dynamic = (xml.Element("string")) {
     attributes {
@@ -30,7 +30,7 @@ function mapSingleResourceString(
     s.value
 }
 
-function mapQuantityResourceString(
+local function mapQuantityResourceString(
     s: string.QuantityResourceString
 ): Dynamic = (xml.Element("plurals")) {
     attributes {
@@ -41,7 +41,7 @@ function mapQuantityResourceString(
     }
 }
 
-function mapQuantityOption(
+local function mapQuantityOption(
     q: string.QuantityOption
 ): Dynamic = (xml.Element("item")) {
     attributes {

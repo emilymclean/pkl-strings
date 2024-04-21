@@ -1,35 +1,21 @@
 import "pkl:xml" as xml
 import "android.pkl"
+import "apple.pkl"
 import "string.pkl"
 
-languages = List(
-    new string.Language {
-        strings = List(
-            new string.SingleResourceString {
-                name = "Test"
-                value = "TestValue"
-            },
-            new string.QuantityResourceString {
-                name = "Quantity"
-                options = List(
-                    new string.QuantityOption {
-                        quantity = "one"
-                        value = "Thing"
-                    },
-                    new string.QuantityOption {
-                        quantity = "other"
-                        value = "Things"
-                    }
-                )
-            }
-        )
-    }
-)
+localizable: string.Localizable
 
-hidden androidOutput = android.render(languages)
+hidden androidOutput = android.render(localizable)
+hidden appleOutput = apple.render(localizable)
 hidden output {
     files {
         for (k,v in androidOutput) {
+            [k] {
+                renderer = v.renderer
+                value = v.value
+            }
+        }
+        for (k,v in appleOutput) {
             [k] {
                 renderer = v.renderer
                 value = v.value

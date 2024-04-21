@@ -1,12 +1,17 @@
-typealias Quanitity = "zero" | "one" | "two" | "few" | "many" | "other"
+typealias Quantity = "zero" | "one" | "two" | "few" | "many" | "other"
+
+class Localizable {
+    sourceLanguage: String = "en"
+    languages: List<Language>
+}
 
 class Language {
-    code: String?
+    code: String
     strings: List<ResourceString>
 }
 
 abstract class ResourceString {
-    name: String
+    name: String(matches(Regex("^[a-z\\d_]+$")))
 }
 
 class SingleResourceString extends ResourceString {
@@ -18,6 +23,6 @@ class QuantityResourceString extends ResourceString {
 }
 
 class QuantityOption {
-    quantity: Quanitity
+    quantity: Quantity
     value: String
 }
