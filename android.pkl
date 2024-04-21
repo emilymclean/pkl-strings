@@ -1,6 +1,15 @@
 import "pkl:xml" as xml
 import "string.pkl"
 
+function render(languages: List<string.Language>): Mapping<String, Any> = new Mapping {
+    for(language in languages) {
+        [if (language.code == null) "values/strings.xml" else "values-\(language.code)/strings.xml"] {
+            renderer = new xml.Renderer {}
+            value = mapResources(language.strings)
+        }
+    }
+}
+
 function mapResources(resources: List<string.ResourceString>) = (xml.Element("resources")) {
     for (r in resources) {
         if (r is string.SingleResourceString)

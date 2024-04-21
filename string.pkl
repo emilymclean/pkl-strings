@@ -1,7 +1,9 @@
-
-hidden resources: List<ResourceString>
-
 typealias Quanitity = "zero" | "one" | "two" | "few" | "many" | "other"
+
+class Language {
+    code: String?
+    strings: List<ResourceString>
+}
 
 abstract class ResourceString {
     name: String
