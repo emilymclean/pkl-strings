@@ -1,7 +1,7 @@
 import "string.pkl"
 
 function render(localizable: string.Localizable): Mapping<String, Any> = new Mapping {
-    ["Localizable.xcstrings"] {
+    ["apple/Localizable.xcstrings"] {
         renderer = new JsonRenderer {}
         value = new Localizable {
             sourceLanguage = localizable.sourceLanguage
