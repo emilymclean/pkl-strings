@@ -20,6 +20,8 @@ class SingleResourceString extends ResourceString {
 
 class QuantityResourceString extends ResourceString {
     options: List<QuantityOption>
+
+    function first(): String = options[0].value
 }
 
 class QuantityOption {
