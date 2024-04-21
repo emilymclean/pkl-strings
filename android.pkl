@@ -18,7 +18,7 @@ class AndroidStringRenderer extends string.StringRenderer {
         }
     }
 
-    local function mapResources(resources: List<string.ResourceString>) = (xml.Element("resources")) {
+    local function mapResources(resources: Listing<string.ResourceString>) = (xml.Element("resources")) {
         for (r in resources) {
             if (r is string.SingleResourceString)
                 mapSingleResourceString(r)

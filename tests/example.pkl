@@ -2,50 +2,50 @@ amends "../output.pkl"
 import "../string.pkl"
 
 localizable = new string.Localizable {
-    languages = List(
+    languages = new Listing {
         new string.Language {
             code = "en"
-            strings = List(
+            strings = new Listing {
                 new string.SingleResourceString {
                     name = "test"
                     value = "TestValue"
-                },
+                }
                 new string.QuantityResourceString {
                     name = "quantity"
-                    options = List(
+                    options = new Listing {
                         new string.QuantityOption {
                             quantity = "one"
                             value = "%d Thing"
-                        },
+                        }
                         new string.QuantityOption {
                             quantity = "other"
                             value = "%d Things"
                         }
-                    )
-                },
+                    }
+                }
                 new string.QuantityResourceString {
                     name = "quantity2"
-                    options = List(
+                    options = new Listing {
                         new string.QuantityOption {
                             quantity = "one"
                             value = "%1$d Thing"
-                        },
+                        }
                         new string.QuantityOption {
                             quantity = "other"
                             value = "%1$d Things"
                         }
-                    )
-                },
+                    }
+                }
                 new string.QuantityResourceString {
                     name = "quantity3"
-                    options = List(
+                    options = new Listing {
                         new string.QuantityOption {
                             quantity = "one"
                             value = "%1$s %2$d Thing"
                             platformValue = new Mapping {
                                 ["apple"] = "%1$s %2$u Thing"
                             }
-                        },
+                        }
                         new string.QuantityOption {
                             quantity = "other"
                             value = "%1$s %2$d Things"
@@ -53,44 +53,44 @@ localizable = new string.Localizable {
                                 ["apple"] = "%1$s %2$u Things"
                             }
                         }
-                    )
+                    }
                 }
-            )
-        },
+            }
+        }
         new string.Language {
             code = "en-au" // I'm australian so this is fine
-            strings = List(
+            strings = new Listing {
                 new string.SingleResourceString {
                     name = "test"
                     value = "TestValue Mate"
-                },
+                }
                 new string.QuantityResourceString {
                     name = "quantity"
-                    options = List(
+                    options = new Listing {
                         new string.QuantityOption {
                             quantity = "one"
                             value = "%d Thing Mate"
-                        },
+                        }
                         new string.QuantityOption {
                             quantity = "other"
                             value = "%d Things Mate"
                         }
-                    )
-                },
+                    }
+                }
                 new string.QuantityResourceString {
                     name = "quantity2"
-                    options = List(
+                    options = new Listing {
                         new string.QuantityOption {
                             quantity = "one"
                             value = "%1$d Thing Mate"
-                        },
+                        }
                         new string.QuantityOption {
                             quantity = "other"
                             value = "%1$d Things Mate"
                         }
-                    )
+                    }
                 }
-            )
+            }
         }
-    )
+    }
 }

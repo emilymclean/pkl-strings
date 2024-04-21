@@ -10,12 +10,12 @@ abstract class StringRenderer {
 
 class Localizable {
     sourceLanguage: String = "en"
-    languages: List<Language>
+    languages: Listing<Language>
 }
 
 class Language {
     code: String
-    strings: List<ResourceString>
+    strings: Listing<ResourceString>
 }
 
 abstract class ResourceString {
@@ -30,7 +30,7 @@ class SingleResourceString extends ResourceString {
 }
 
 class QuantityResourceString extends ResourceString {
-    options: List<QuantityOption>(length > 0)
+    options: Listing<QuantityOption>(length > 0)
 
     function first(platformName: String): String = options[0].get(platformName)
 }

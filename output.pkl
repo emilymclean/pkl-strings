@@ -4,10 +4,10 @@ import "apple.pkl"
 import "string.pkl"
 
 localizable: string.Localizable
-renderers: List<string.StringRenderer> = List(
-    new android.AndroidStringRenderer {},
+renderers: Listing<string.StringRenderer> = new Listing {
+    new android.AndroidStringRenderer {}
     new apple.AppleStringRenderer {}
-)
+}
 
 hidden output {
     files {

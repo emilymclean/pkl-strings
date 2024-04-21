@@ -17,8 +17,8 @@ class AppleStringRenderer extends string.StringRenderer {
     }
 
     local function mapStrings(
-        keys: List<String>, 
-        languages: List<string.Language>
+        keys: Listing<String>, 
+        languages: Listing<string.Language>
     ): Mapping<String, LocalizableString> = new Mapping {
         for (key in keys) {
             [key] = new LocalizableString {
@@ -28,7 +28,7 @@ class AppleStringRenderer extends string.StringRenderer {
     }
 
     local function mapLanguageStrings(
-        strings: List<StringLanguagePair>
+        strings: Listing<StringLanguagePair>
     ): Mapping<String, StringLocalization> = new Mapping {
         for (s in strings) {
             [s.code] = if (s.string is string.SingleResourceString)
@@ -71,18 +71,24 @@ class AppleStringRenderer extends string.StringRenderer {
 
     local function getStringInLanguages(
         key: String,
-        languages: List<string.Language>
-    ): List<StringLanguagePair> = languages.flatMap(
-        (l) -> l.strings.filter((s) -> s.name == key).map((s) -> new StringLanguagePair {
-            string = s
-            code = l.code ?? defaultLanguage
-        })
-    )
+        languages: Listing<string.Language>
+    ): Listing<StringLanguagePair> = languages.toList().flatMap(
+        (l) -> l.strings.toList().filter(
+            (s) -> s.name == key
+        ).map(
+            (s) -> new StringLanguagePair {
+                string = s
+                code = l.code ?? defaultLanguage
+            }
+        )
+    ).toListing()
 
     local function getKeys(
-        languages: List<string.Language>,
+        languages: Listing<string.Language>,
         sourceLanguage: String
-    ): List<String> = languages.filter((l) -> l.code == sourceLanguage).flatMap((l) -> l.strings.map((s) -> s.name))
+    ): Listing<String> = languages.toList()
+        .filter((l) -> l.code == sourceLanguage).flatMap((l) -> l.strings.toList().map((s) -> s.name))
+        .toListing()
 
     local function replaceFirstDigit(value: String): FirstDigitInformation = _replaceFirstDigit(
         value, 
