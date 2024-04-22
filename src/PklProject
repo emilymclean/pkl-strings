@@ -4,7 +4,7 @@ local githubUser = "BenMMcLean"
 
 package {
   name = "pkl-strings"
-  baseUri = "package://pkg.pkl-lang.org/github.com/\(githubUser)/\(name)" 
+  baseUri = "package://github.com/\(githubUser)/\(name)" 
   version = read("file:.version").text.trim()
-  packageZipUrl = "https://github.com/\(githubUser)/\(name)/releases/download/\(name)@\(version)/\(name)@\(version).zip"
+  packageZipUrl = "https://github.com/\(githubUser)/\(name)/releases/download/v\(version)/\(name)@\(version)"
 }

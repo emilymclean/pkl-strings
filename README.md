@@ -5,5 +5,5 @@ Generate platform specific string/translation files from a single source file. C
 ## Usage
 
 ```pkl
-amends "package://pkg.pkl-lang.org/github.com/BenMMcLean/pkl-strings/pkl-strings@0.1.0-alpha.168#/strings.pkl"
+amends "package://github.com/BenMMcLean/pkl-strings/releases/download/v0.1.0-alpha.168/pkl-strings@0.1.0-alpha.168"
 ```
