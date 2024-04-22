@@ -71,7 +71,7 @@ jobs:
       - uses: tvdias/github-tagger@v0.0.1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          tag: pkl-string@${{ needs.version.outputs.version }}
+          tag: pkl-strings@${{ needs.version.outputs.version }}
   version-update:
     runs-on: ubuntu-latest
     needs: 
