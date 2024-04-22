@@ -39,7 +39,7 @@ jobs:
       proceed: ${{ steps.release.outputs.proceed && github.event_name != 'pull_request' }}
     steps:
       - id: release
-        uses: phish108/release-check@1.0.11-main.3
+        uses: phish108/release-check@1.0.15
         with: 
           github-token: ${{ secrets.GITHUB_TOKEN }}
           protected-paths: |
