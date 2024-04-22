@@ -103,6 +103,8 @@ jobs:
     needs: 
       - version
       - release
+    permissions:
+      contents: write
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
