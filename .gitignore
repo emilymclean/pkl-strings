@@ -4,3 +4,5 @@ strings.xml
 tests/Localizable.xcstrings
 
 *.xcstrings
+
+.out/
