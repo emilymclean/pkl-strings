@@ -6,5 +6,5 @@ package {
   name = "pkl-strings"
   baseUri = "package://github.com/\(githubUser)/\(name)" 
   version = read("file:.version").text.trim()
-  packageZipUrl = "https://github.com/\(githubUser)/\(name)/releases/download/v\(version)/\(name)@\(version)"
+  packageZipUrl = "https://github.com/\(githubUser)/\(name)/releases/download/v\(version)/\(name)@\(version).zip"
 }
