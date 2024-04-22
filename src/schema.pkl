@@ -1,3 +1,6 @@
+localizable: Localizable
+renderers: Listing<StringRenderer>
+
 typealias Quantity = "zero" | "one" | "two" | "few" | "many" | "other"
 
 abstract class StringRenderer {

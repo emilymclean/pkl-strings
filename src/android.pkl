@@ -1,10 +1,10 @@
 import "pkl:xml" as xml
-import "string.pkl"
+import "schema.pkl"
 
-class AndroidStringRenderer extends string.StringRenderer {
+class AndroidStringRenderer extends schema.StringRenderer {
     platformName: String = "android"
 
-    function render(localizable: string.Localizable): Mapping<String, FileOutput> = new Mapping {
+    function render(localizable: schema.Localizable): Mapping<String, FileOutput> = new Mapping {
         for(language in localizable.languages) {
             [
                 if (language.code == localizable.sourceLanguage) 
@@ -18,11 +18,11 @@ class AndroidStringRenderer extends string.StringRenderer {
         }
     }
 
-    local function mapResources(resources: Listing<string.ResourceString>) = (xml.Element("resources")) {
+    local function mapResources(resources: Listing<schema.ResourceString>) = (xml.Element("resources")) {
         for (r in resources) {
-            if (r is string.SingleResourceString)
+            if (r is schema.SingleResourceString)
                 mapSingleResourceString(r)
-            else if(r is string.QuantityResourceString)
+            else if(r is schema.QuantityResourceString)
                 mapQuantityResourceString(r)
             else
                 throw("Unknown element")
@@ -30,7 +30,7 @@ class AndroidStringRenderer extends string.StringRenderer {
     }
 
     local function mapSingleResourceString(
-        s: string.SingleResourceString
+        s: schema.SingleResourceString
     ): Dynamic = (xml.Element("string")) {
         attributes {
             ["name"] = s.name
@@ -39,7 +39,7 @@ class AndroidStringRenderer extends string.StringRenderer {
     }
 
     local function mapQuantityResourceString(
-        s: string.QuantityResourceString
+        s: schema.QuantityResourceString
     ): Dynamic = (xml.Element("plurals")) {
         attributes {
             ["name"] = s.name
@@ -50,7 +50,7 @@ class AndroidStringRenderer extends string.StringRenderer {
     }
 
     local function mapQuantityOption(
-        q: string.QuantityOption
+        q: schema.QuantityOption
     ): Dynamic = (xml.Element("item")) {
         attributes {
             ["quantity"] = q.quantity

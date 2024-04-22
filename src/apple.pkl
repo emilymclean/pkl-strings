@@ -1,15 +1,15 @@
-import "string.pkl"
+import "schema.pkl"
 
-class AppleStringRenderer extends string.StringRenderer {
+class AppleStringRenderer extends schema.StringRenderer {
     platformName: String = "apple"
 
-    function render(localizable: string.Localizable): Mapping<String, FileOutput> = new Mapping {
+    function render(localizable: schema.Localizable): Mapping<String, FileOutput> = new Mapping {
         ["apple/Localizable.xcstrings"] = new FileOutput {
             renderer = new JsonRenderer {}
             value = new Localizable {
                 sourceLanguage = localizable.sourceLanguage
                 strings = mapStrings(
-                    string.getKeysForLanguage(localizable.languages, localizable.sourceLanguage),
+                    schema.getKeysForLanguage(localizable.languages, localizable.sourceLanguage),
                     localizable.languages
                 )
             }
@@ -18,7 +18,7 @@ class AppleStringRenderer extends string.StringRenderer {
 
     local function mapStrings(
         keys: List<String>, 
-        languages: Listing<string.Language>
+        languages: Listing<schema.Language>
     ): Mapping<String, LocalizableString> = new Mapping {
         for (key in keys) {
             [key] = new LocalizableString {
@@ -31,22 +31,22 @@ class AppleStringRenderer extends string.StringRenderer {
         strings: Listing<StringLanguagePair>
     ): Mapping<String, StringLocalization> = new Mapping {
         for (s in strings) {
-            [s.code] = if (s.string is string.SingleResourceString)
+            [s.code] = if (s.string is schema.SingleResourceString)
                 mapSingleString(s.string)
             else
                 mapPluralString(s.string)
         }
     }
 
-    local function mapSingleString(s: string.SingleResourceString): StringLocalization = new StringLocalization {
+    local function mapSingleString(s: schema.SingleResourceString): StringLocalization = new StringLocalization {
         stringUnit = new StringUnit {
             value = s.get(platformName)
         }
     }
 
-    local function mapPluralString(s: string.QuantityResourceString): StringLocalization = _mapPluralString(s, replaceFirstDigit(s.first(platformName)))
+    local function mapPluralString(s: schema.QuantityResourceString): StringLocalization = _mapPluralString(s, replaceFirstDigit(s.first(platformName)))
 
-    local function _mapPluralString(s: string.QuantityResourceString, f: FirstDigitInformation?): StringLocalization = if (f != null)
+    local function _mapPluralString(s: schema.QuantityResourceString, f: FirstDigitInformation?): StringLocalization = if (f != null)
         new StringLocalization {
             stringUnit = new StringUnit {
                 value = f.transformed
@@ -72,7 +72,7 @@ class AppleStringRenderer extends string.StringRenderer {
     else
         simpleMapPluralString(s)
 
-    local function simpleMapPluralString(s: string.QuantityResourceString): StringLocalization = new StringLocalization {
+    local function simpleMapPluralString(s: schema.QuantityResourceString): StringLocalization = new StringLocalization {
         variations = new Variations {
             plural = new Mapping {
                 for (option in s.options) {
@@ -88,7 +88,7 @@ class AppleStringRenderer extends string.StringRenderer {
 
     local function getStringInLanguages(
         key: String,
-        languages: Listing<string.Language>
+        languages: Listing<schema.Language>
     ): Listing<StringLanguagePair> = languages.toList().flatMap(
         (l) -> l.strings.toList().filter(
             (s) -> s.name == key
@@ -151,11 +151,11 @@ class Substitution {
 }
 
 class Variations {
-    plural: Mapping<string.Quantity, StringLocalization>
+    plural: Mapping<schema.Quantity, StringLocalization>
 }
 
 local class StringLanguagePair {
-    string: string.ResourceString
+    string: schema.ResourceString
     code: String
 }
 

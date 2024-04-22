@@ -1,15 +1,16 @@
-import "pkl:xml" as xml
+amends "schema.pkl"
 import "android.pkl"
 import "apple.pkl"
-import "string.pkl"
 
-localizable: string.Localizable
-renderers: Listing<string.StringRenderer> = new Listing {
+localizable = new Localizable {
+    languages = new Listing {}
+}
+renderers = new Listing {
     new android.AndroidStringRenderer {}
     new apple.AppleStringRenderer {}
 }
 
-hidden output {
+output {
     files {
         for (renderer in renderers) {
             ...renderer.render(localizable)

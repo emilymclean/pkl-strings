@@ -1,52 +1,51 @@
-amends "../output.pkl"
-import "../string.pkl"
+amends "../src/strings.pkl"
 
-localizable = new string.Localizable {
+localizable = new Localizable {
     languages = new Listing {
-        new string.Language {
+        new Language {
             code = "en"
             strings = new Listing {
-                new string.SingleResourceString {
+                new SingleResourceString {
                     name = "single"
                     value = "TestValue"
                 }
-                new string.QuantityResourceString {
+                new QuantityResourceString {
                     name = "quantity_positional"
                     options = new Listing {
-                        new string.QuantityOption {
+                        new QuantityOption {
                             quantity = "one"
                             value = "%d Thing"
                         }
-                        new string.QuantityOption {
+                        new QuantityOption {
                             quantity = "other"
                             value = "%d Things"
                         }
                     }
                 }
-                new string.QuantityResourceString {
+                new QuantityResourceString {
                     name = "quantity_specified"
                     options = new Listing {
-                        new string.QuantityOption {
+                        new QuantityOption {
                             quantity = "one"
                             value = "%1$d Thing"
                         }
-                        new string.QuantityOption {
+                        new QuantityOption {
                             quantity = "other"
                             value = "%1$d Things"
                         }
                     }
                 }
-                new string.QuantityResourceString {
+                new QuantityResourceString {
                     name = "quantity_platform_variation"
                     options = new Listing {
-                        new string.QuantityOption {
+                        new QuantityOption {
                             quantity = "one"
                             value = "%1$s %2$d Thing"
                             platformValue = new Mapping {
                                 ["apple"] = "%1$s %2$u Thing"
                             }
                         }
-                        new string.QuantityOption {
+                        new QuantityOption {
                             quantity = "other"
                             value = "%1$s %2$d Things"
                             platformValue = new Mapping {
@@ -55,14 +54,14 @@ localizable = new string.Localizable {
                         }
                     }
                 }
-                new string.QuantityResourceString {
+                new QuantityResourceString {
                     name = "quantity_no_digits"
                     options = new Listing {
-                        new string.QuantityOption {
+                        new QuantityOption {
                             quantity = "one"
                             value = "Thing"
                         }
-                        new string.QuantityOption {
+                        new QuantityOption {
                             quantity = "other"
                             value = "Things"
                         }
@@ -70,34 +69,34 @@ localizable = new string.Localizable {
                 }
             }
         }
-        new string.Language {
+        new Language {
             code = "en-au" // I'm australian so this is fine
             strings = new Listing {
-                new string.SingleResourceString {
+                new SingleResourceString {
                     name = "single"
                     value = "TestValue Mate"
                 }
-                new string.QuantityResourceString {
+                new QuantityResourceString {
                     name = "quantity_positional"
                     options = new Listing {
-                        new string.QuantityOption {
+                        new QuantityOption {
                             quantity = "one"
                             value = "%d Thing Mate"
                         }
-                        new string.QuantityOption {
+                        new QuantityOption {
                             quantity = "other"
                             value = "%d Things Mate"
                         }
                     }
                 }
-                new string.QuantityResourceString {
+                new QuantityResourceString {
                     name = "quantity_specified"
                     options = new Listing {
-                        new string.QuantityOption {
+                        new QuantityOption {
                             quantity = "one"
                             value = "%1$d Thing Mate"
                         }
-                        new string.QuantityOption {
+                        new QuantityOption {
                             quantity = "other"
                             value = "%1$d Things Mate"
                         }
