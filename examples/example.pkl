@@ -7,11 +7,11 @@ localizable = new string.Localizable {
             code = "en"
             strings = new Listing {
                 new string.SingleResourceString {
-                    name = "test"
+                    name = "single"
                     value = "TestValue"
                 }
                 new string.QuantityResourceString {
-                    name = "quantity"
+                    name = "quantity_positional"
                     options = new Listing {
                         new string.QuantityOption {
                             quantity = "one"
@@ -24,7 +24,7 @@ localizable = new string.Localizable {
                     }
                 }
                 new string.QuantityResourceString {
-                    name = "quantity2"
+                    name = "quantity_specified"
                     options = new Listing {
                         new string.QuantityOption {
                             quantity = "one"
@@ -37,7 +37,7 @@ localizable = new string.Localizable {
                     }
                 }
                 new string.QuantityResourceString {
-                    name = "quantity3"
+                    name = "quantity_platform_variation"
                     options = new Listing {
                         new string.QuantityOption {
                             quantity = "one"
@@ -55,17 +55,30 @@ localizable = new string.Localizable {
                         }
                     }
                 }
+                new string.QuantityResourceString {
+                    name = "quantity_no_digits"
+                    options = new Listing {
+                        new string.QuantityOption {
+                            quantity = "one"
+                            value = "Thing"
+                        }
+                        new string.QuantityOption {
+                            quantity = "other"
+                            value = "Things"
+                        }
+                    }
+                }
             }
         }
         new string.Language {
             code = "en-au" // I'm australian so this is fine
             strings = new Listing {
                 new string.SingleResourceString {
-                    name = "test"
+                    name = "single"
                     value = "TestValue Mate"
                 }
                 new string.QuantityResourceString {
-                    name = "quantity"
+                    name = "quantity_positional"
                     options = new Listing {
                         new string.QuantityOption {
                             quantity = "one"
@@ -78,7 +91,7 @@ localizable = new string.Localizable {
                     }
                 }
                 new string.QuantityResourceString {
-                    name = "quantity2"
+                    name = "quantity_specified"
                     options = new Listing {
                         new string.QuantityOption {
                             quantity = "one"
