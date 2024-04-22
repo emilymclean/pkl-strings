@@ -9,7 +9,7 @@ class AppleStringRenderer extends string.StringRenderer {
             value = new Localizable {
                 sourceLanguage = localizable.sourceLanguage
                 strings = mapStrings(
-                    getKeys(localizable.languages, localizable.sourceLanguage),
+                    string.getKeysForLanguage(localizable.languages, localizable.sourceLanguage),
                     localizable.languages
                 )
             }
@@ -17,7 +17,7 @@ class AppleStringRenderer extends string.StringRenderer {
     }
 
     local function mapStrings(
-        keys: Listing<String>, 
+        keys: List<String>, 
         languages: Listing<string.Language>
     ): Mapping<String, LocalizableString> = new Mapping {
         for (key in keys) {
@@ -99,13 +99,6 @@ class AppleStringRenderer extends string.StringRenderer {
             }
         )
     ).toListing()
-
-    local function getKeys(
-        languages: Listing<string.Language>,
-        sourceLanguage: String
-    ): Listing<String> = languages.toList()
-        .filter((l) -> l.code == sourceLanguage).flatMap((l) -> l.strings.toList().map((s) -> s.name))
-        .toListing()
 
     local function replaceFirstDigit(value: String): FirstDigitInformation? = _replaceFirstDigit(
         value, 

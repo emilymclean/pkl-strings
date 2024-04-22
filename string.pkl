@@ -10,7 +10,7 @@ abstract class StringRenderer {
 
 class Localizable {
     sourceLanguage: String = "en"
-    languages: Listing<Language>
+    languages: Listing<Language>(checkKeysMatchSourceLanguage(this, getKeysForLanguage(this, sourceLanguage).toList()))
 }
 
 class Language {
@@ -42,3 +42,14 @@ class QuantityOption {
 
     function get(platformName: String): String = platformValue?.getOrNull(platformName) ?? value
 }
+
+const function checkKeysMatchSourceLanguage(languages: Listing<Language>, keys: List<String>): Boolean =
+    !languages.toList().map(
+        (s) -> s.strings.toList().fold(true, (r,e) -> r && keys.contains(e.name))
+    ).any((b) -> !b)
+
+const function getKeysForLanguage(
+    languages: Listing<Language>,
+    sourceLanguage: String
+): List<String> = languages.toList()
+    .filter((l) -> l.code == sourceLanguage).flatMap((l) -> l.strings.toList().map((s) -> s.name))
