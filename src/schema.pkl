@@ -1,5 +1,4 @@
-localizable: Localizable
-renderers: Listing<StringRenderer>
+open module schema
 
 typealias Quantity = "zero" | "one" | "two" | "few" | "many" | "other"
 

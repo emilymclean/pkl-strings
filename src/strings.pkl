@@ -1,11 +1,9 @@
-amends "schema.pkl"
+extends "schema.pkl"
 import "android.pkl"
 import "apple.pkl"
 
-localizable = new Localizable {
-    languages = new Listing {}
-}
-renderers = new Listing {
+localizable: Localizable
+renderers: Listing<StringRenderer> = new Listing {
     new android.AndroidStringRenderer {}
     new apple.AppleStringRenderer {}
 }
