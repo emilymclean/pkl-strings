@@ -54,7 +54,7 @@ jobs:
       contents: write
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
-    if: needs.should-release.outputs.proceed
+    if: ${{ needs.should-release.outputs.proceed }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -79,7 +79,7 @@ jobs:
       - should-release
     permissions:
       contents: write
-    if: needs.should-release.outputs.proceed
+    if: ${{ needs.should-release.outputs.proceed }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
