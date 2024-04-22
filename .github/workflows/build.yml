@@ -125,4 +125,5 @@ jobs:
       run: |
         TAG=pkl-strings@${{ needs.version.outputs.version }}
         gh release upload $TAG .out/$TAG/*
+        gh release edit $TAG -t $TAG
 
