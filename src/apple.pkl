@@ -4,7 +4,7 @@ class AppleStringRenderer extends schema.StringRenderer {
     platformName: String = "apple"
 
     function render(localizable: schema.Localizable): Mapping<String, FileOutput> = new Mapping {
-        ["apple/Localizable.xcstrings"] = new FileOutput {
+        ["\(platformName)/Localizable.xcstrings"] = new FileOutput {
             renderer = new JsonRenderer {}
             value = new Localizable {
                 sourceLanguage = localizable.sourceLanguage
