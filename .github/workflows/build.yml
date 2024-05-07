@@ -111,7 +111,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Upload to pages
-        uses: BenMMcLean/pkl-upload-package@v1
+        uses: BenMMcLean/pkl-upload-package@v1.1.0
         with:
           input-directory: src
 
