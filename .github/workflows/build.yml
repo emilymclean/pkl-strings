@@ -72,33 +72,7 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           tag: pkl-strings@${{ needs.version.outputs.version }}
-  version-update:
-    runs-on: ubuntu-latest
-    needs: 
-      - version
-      - should-release
-    permissions:
-      contents: write
-    if: ${{ needs.should-release.outputs.proceed }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - uses: DamianReeves/write-file-action@master
-        with:
-          path: .version
-          write-mode: overwrite
-          contents: ${{ needs.version.outputs.version }}
-      - name: Find and Replace
-        uses: jacobtomlinson/gha-find-replace@v3
-        with:
-          find: "${{ needs.version.outputs.current-version }}"
-          replace: "${{ needs.version.outputs.version }}"
-          regex: false
-          include: README.md
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: Update version numbers
-  upload-project:
+  release-project:
     runs-on: ubuntu-latest
     needs: 
       - version
@@ -106,24 +80,38 @@ jobs:
     permissions:
       contents: write
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Install pkl
-      uses: pkl-community/setup-pkl@v0
-      with:
-        pkl-version: 0.25.3
-    - uses: DamianReeves/write-file-action@master
-      with:
-        path: .version
-        write-mode: overwrite
-        contents: ${{ needs.version.outputs.version }}
-    - name: Package Pkl
-      run: pkl project package src
-    - name: Upload Release Artifact
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        TAG=pkl-strings@${{ needs.version.outputs.version }}
-        gh release upload v${{ needs.version.outputs.version }} .out/$TAG/*
-        gh release edit v${{ needs.version.outputs.version }} -t v${{ needs.version.outputs.version }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install pkl
+        uses: pkl-community/setup-pkl@v0
+        with:
+          pkl-version: 0.25.3
+      - uses: DamianReeves/write-file-action@master
+        with:
+          path: .version
+          write-mode: overwrite
+          contents: ${{ needs.version.outputs.version }}
+      - name: Package Pkl
+        run: pkl project package src
+      - name: Upload Release Artifact
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=pkl-strings@${{ needs.version.outputs.version }}
+          gh release upload v${{ needs.version.outputs.version }} .out/$TAG/*
+          gh release edit v${{ needs.version.outputs.version }} -t v${{ needs.version.outputs.version }}
+  publish-project:
+    runs-on: ubuntu-latest
+    needs: 
+      - version
+      - release
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Upload to pages
+        uses: BenMMcLean/pkl-upload-package@v1
+        with:
+          input-directory: src
 
