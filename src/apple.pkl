@@ -4,7 +4,7 @@ class AppleStringRenderer extends schema.StringRenderer {
     platformName: String = "apple"
 
     function render(localizable: schema.Localizable): Mapping<String, FileOutput> = new Mapping {
-        ["apple/Localizable.xcstrings"] = new FileOutput {
+        ["\(platformName)/Localizable.xcstrings"] = new FileOutput {
             renderer = new JsonRenderer {}
             value = new Localizable {
                 sourceLanguage = localizable.sourceLanguage
@@ -44,23 +44,26 @@ class AppleStringRenderer extends schema.StringRenderer {
         }
     }
 
-    local function mapPluralString(s: schema.QuantityResourceString): StringLocalization = _mapPluralString(s, replaceFirstDigit(s.first(platformName)))
-
-    local function _mapPluralString(s: schema.QuantityResourceString, f: FirstDigitInformation?): StringLocalization = if (f != null)
-        new StringLocalization {
-            stringUnit = new StringUnit {
-                value = f.transformed
-            }
-            substitutions = new Mapping {
-                ["arg1"] = new Substitution {
-                    argNum = f.position
-                    formatSpecifier = f.formatChar
-                    variations = new Variations {
-                        plural = new Mapping {
-                            for (option in s.options) {
-                                [option.quantity] = new StringLocalization {
-                                    stringUnit = new StringUnit {
-                                        value = replaceFirstDigit(option.get(platformName))?.transformed ?? option.get(platformName)
+    local function mapPluralString(
+        s: schema.QuantityResourceString
+    ): StringLocalization = 
+        let (f = replaceFirstDigit(s.first(platformName))) 
+        if (f != null)
+            new StringLocalization {
+                stringUnit = new StringUnit {
+                    value = f.transformed
+                }
+                substitutions = new Mapping {
+                    ["arg1"] = new Substitution {
+                        argNum = f.position
+                        formatSpecifier = f.formatChar
+                        variations = new Variations {
+                            plural = new Mapping {
+                                for (option in s.options) {
+                                    [option.quantity] = new StringLocalization {
+                                        stringUnit = new StringUnit {
+                                            value = replaceFirstDigit(option.get(platformName))?.transformed ?? option.get(platformName)
+                                        }
                                     }
                                 }
                             }
@@ -68,9 +71,9 @@ class AppleStringRenderer extends schema.StringRenderer {
                     }
                 }
             }
-        }
-    else
-        simpleMapPluralString(s)
+        else
+            simpleMapPluralString(s)
+        
 
     local function simpleMapPluralString(s: schema.QuantityResourceString): StringLocalization = new StringLocalization {
         variations = new Variations {
@@ -100,25 +103,21 @@ class AppleStringRenderer extends schema.StringRenderer {
         )
     ).toListing()
 
-    local function replaceFirstDigit(value: String): FirstDigitInformation? = _replaceFirstDigit(
-        value, 
-        Regex("%(\\d)\\$([dDuUxXfeEgGcC])").findMatchesIn(value).firstOrNull,
-        Regex("%([dDuUxXfeEgGcC])").findMatchesIn(value).firstOrNull
-    )
-
-    local function _replaceFirstDigit(value: String, specifiedMatch: RegexMatch?, positionalMatch: RegexMatch?): FirstDigitInformation? = if (specifiedMatch != null)
-        new FirstDigitInformation {
-            transformed = value.replaceAll("%\(specifiedMatch.groups[1].value)$\(specifiedMatch.groups[2].value)", "%#@arg1@")
-            formatChar = specifiedMatch.groups[2].value
-            position = specifiedMatch.groups[1].value.toInt()
-        } 
-    else if(positionalMatch != null)
-        new FirstDigitInformation {
-            transformed = value.replaceFirst("%[dDuUxXfeEgGcC]", "%#@arg1@")
-            formatChar = positionalMatch.groups[1]?.value
-        } 
-    else null
-        
+    local function replaceFirstDigit(value: String): FirstDigitInformation? =
+        let (specifiedMatch = Regex("%(\\d)\\$([dDuUxXfeEgGcC])").findMatchesIn(value).firstOrNull)
+        let (positionalMatch = Regex("%([dDuUxXfeEgGcC])").findMatchesIn(value).firstOrNull)
+        if (specifiedMatch != null)
+            new FirstDigitInformation {
+                transformed = value.replaceAll("%\(specifiedMatch.groups[1].value)$\(specifiedMatch.groups[2].value)", "%#@arg1@")
+                formatChar = specifiedMatch.groups[2].value
+                position = specifiedMatch.groups[1].value.toInt()
+            } 
+        else if(positionalMatch != null)
+            new FirstDigitInformation {
+                transformed = value.replaceFirst("%[dDuUxXfeEgGcC]", "%#@arg1@")
+                formatChar = positionalMatch.groups[1]?.value
+            } 
+        else null   
 }
 
 class Localizable {

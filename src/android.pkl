@@ -8,9 +8,9 @@ class AndroidStringRenderer extends schema.StringRenderer {
         for(language in localizable.languages) {
             [
                 if (language.code == localizable.sourceLanguage) 
-                    "android/values/strings.xml" 
+                    "\(platformName)/values/strings.xml" 
                 else 
-                    "android/values-\(language.code)/strings.xml"
+                    "\(platformName)/values-\(language.code)/strings.xml"
             ] = new FileOutput {
                 renderer = new xml.Renderer {}
                 value = mapResources(language.strings)
