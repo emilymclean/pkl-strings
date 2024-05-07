@@ -110,6 +110,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - uses: DamianReeves/write-file-action@master
+        with:
+          path: .version
+          write-mode: overwrite
+          contents: ${{ needs.version.outputs.version }}
       - name: Upload to pages
         uses: BenMMcLean/pkl-upload-package@v1.1.0
         with:
