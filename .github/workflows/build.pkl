@@ -1,0 +1,9 @@
+amends "package://components.emilym.cl/actions/actions@0.1.6#/build-pkl.pkl"
+
+modules = new Listing {
+    "pkl-strings"
+}.toList()
+
+versionUpdateCommit = false
+extraTags = false
+uploadToGhPages = true
