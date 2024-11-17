@@ -8,7 +8,7 @@ Generate platform specific string/translation files from a single source file. C
 
 Make a new source file amending `strings.pkl` and override `localizable`:
 ```pkl
-amends "package://benm.cl/pkl-strings/pkl-strings@<version>.zip"
+amends "package://emilym.cl/pkl-strings/pkl-strings@<version>.zip"
 
 localizable = new Localizable {
     languages = new Listing {

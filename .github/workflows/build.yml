@@ -1,122 +1,121 @@
-name: Build
-
-on:
+name: Build Pkl
+'on':
+  pull_request:
+    branches:
+    - main
+    - develop
   push:
-    branches: [ master, main, develop ]
-
+    branches:
+    - main
+    - develop
+    - release/**
 jobs:
   version:
     runs-on: ubuntu-latest
     outputs:
-      current-version: ${{ env.CURRENT_VERSION }}
       version: ${{ steps.gitversion.outputs.semVer }}
+      versionCode: ${{ steps.run-number.outputs.versionCode }}
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: '0'
-      - name: Get current Pkl version
-        run: |
-          VER=$(cat .version)
-          echo "CURRENT_VERSION=$VER" >> $GITHUB_ENV
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.6
-        with:
-          versionSpec: '5.x'
-      - name: Use GitVersion
-        id: gitversion # step id used as reference for output values
-        uses: gittools/actions/gitversion/execute@v0.9.6
-        with:
-          useConfigFile: true
-          showConfig: true
-          configFilePath: ./gitversion.yml
-      - name: Display SemVer
-        run: |
-          echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v3.0.0
+      with:
+        versionSpec: 5.x
+    - id: gitversion
+      name: Use GitVersion
+      uses: gittools/actions/gitversion/execute@v3.0.0
+      with:
+        useConfigFile: true
+        configFilePath: ./gitversion.yml
+    - id: run-number
+      run: |-
+        current_run_number=${{ github.run_number }}
+        new_number=$((current_run_number+0))
+        echo "versionCode=${new_number}" >> $GITHUB_OUTPUT
+    - name: Generate Job Summary
+      run: |-
+        echo "# Version Info
+        Semantic Version: ${{ steps.gitversion.outputs.semVer }}
+        Version Number: ${{ steps.run-number.outputs.versionCode }}" >> $GITHUB_STEP_SUMMARY
   should-release:
     runs-on: ubuntu-latest
     outputs:
       proceed: ${{ steps.release.outputs.proceed && github.event_name != 'pull_request' }}
     steps:
-      - id: release
-        uses: phish108/release-check@1.0.15
-        with: 
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          protected-paths: |
-            README.md
-            .version
+    - id: release
+      uses: phish108/release-check@1.0.15
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        protected-paths: |-
+          README.md
+          .version
   release:
-    runs-on: ubuntu-latest
-    needs: 
-      - version
-      - should-release
     permissions:
       contents: write
+    needs:
+    - version
+    - should-release
+    if: needs.should-release.outputs.proceed
+    runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
-    if: ${{ needs.should-release.outputs.proceed }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ needs.version.outputs.version }}
-          release_name: Release ${{ needs.version.outputs.version }}
-          draft: false
-          prerelease: ${{ github.ref == 'refs/heads/develop' }}
-      - uses: tvdias/github-tagger@v0.0.1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          tag: pkl-strings@${{ needs.version.outputs.version }}
-  release-project:
-    runs-on: ubuntu-latest
-    needs: 
-      - version
-      - release
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Create tag for release
+      uses: rickstaa/action-create-tag@v1
+      with:
+        tag: v${{ needs.version.outputs.version }}
+    - id: create_release
+      name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag_name: v${{ needs.version.outputs.version }}
+        name: Release ${{ needs.version.outputs.version }}
+        draft: false
+        prerelease: ${{ github.ref != 'refs/heads/main' }}
+  upload-project:
     permissions:
       contents: write
+    needs:
+    - version
+    - release
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Install pkl
-        uses: pkl-community/setup-pkl@v0
-        with:
-          pkl-version: 0.25.3
-      - uses: DamianReeves/write-file-action@master
-        with:
-          path: .version
-          write-mode: overwrite
-          contents: ${{ needs.version.outputs.version }}
-      - name: Package Pkl
-        run: pkl project package src
-      - name: Upload Release Artifact
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          TAG=pkl-strings@${{ needs.version.outputs.version }}
-          gh release upload v${{ needs.version.outputs.version }} .out/$TAG/*
-          gh release edit v${{ needs.version.outputs.version }} -t v${{ needs.version.outputs.version }}
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Install Pkl
+      uses: pkl-community/setup-pkl@v0
+      with:
+        pkl-version: 0.25.3
+    - run: echo "${{ needs.version.outputs.version }}" > .version
+    - name: Package project
+      run: pkl project package src
+    - name: Upload Release Artifact
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |-
+        TAG=pkl-strings@${{ needs.version.outputs.version }}
+        gh release upload v${{ needs.version.outputs.version }} .out/$TAG/*
+        gh release edit v${{ needs.version.outputs.version }} -t v${{ needs.version.outputs.version }}
   publish-project:
-    runs-on: ubuntu-latest
-    needs: 
-      - version
-      - release
     permissions:
       contents: write
+    needs:
+    - version
+    - release
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - uses: DamianReeves/write-file-action@master
-        with:
-          path: .version
-          write-mode: overwrite
-          contents: ${{ needs.version.outputs.version }}
-      - name: Upload to pages
-        uses: BenMMcLean/pkl-upload-package@v1.1.0
-        with:
-          input-directory: src
-
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - run: echo "${{ needs.version.outputs.version }}" > .version
+    - name: Upload to pages
+      uses: emilymclean/pkl-upload-package@v1.1.0
+      with:
+        input-directory: src
